@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Save, 
   Upload, 
   Trash2, 
   Plus, 
@@ -10,16 +9,14 @@ import {
   XCircle, 
   TrendingUp, 
   Briefcase,
-  Calendar,
-  MoreVertical,
   Download,
-  RotateCcw,
   AlertTriangle,
   X,
-  Heart
+  Heart,
+  Save
 } from 'lucide-react';
 
-// Coefficient: 1.0 (Code run exactly as requested with React 19 style imports)
+// Coefficient: 1.0 (Fixed TS errors for strict build)
 
 // --- Константы и Утилиты ---
 
@@ -92,6 +89,10 @@ export default function CaseChronology() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   
+  // Состояние предупреждения о данных
+  const [showDataWarning, setShowDataWarning] = useState(false);
+  const [dontShowWarningAgain, setDontShowWarningAgain] = useState(false);
+
   // Состояние для подтверждения действий (замена window.confirm)
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -121,9 +122,15 @@ export default function CaseChronology() {
   useEffect(() => {
     const savedMeta = localStorage.getItem('chronos_meta');
     const savedRecords = localStorage.getItem('chronos_records');
+    const warningDismissed = localStorage.getItem('chronos_warning_dismissed');
 
     if (savedMeta) setMeta(JSON.parse(savedMeta));
     if (savedRecords) setRecords(JSON.parse(savedRecords));
+    
+    // Показываем предупреждение, если пользователь его не скрыл ранее
+    if (!warningDismissed) {
+        setShowDataWarning(true);
+    }
     
     setIsLoaded(true);
   }, []);
@@ -139,7 +146,7 @@ export default function CaseChronology() {
   // 3. Аналитика
   const stats = useMemo(() => {
     const total = records.length;
-    const success = records.filter(r => ['satisfied', 'registered'].includes(r.status)).length; 
+    // success variable removed as it was unused
     const finalSuccess = records.filter(r => r.status === 'satisfied').length;
     const fail = records.filter(r => ['rejected', 'ignored'].includes(r.status)).length;
     
@@ -243,6 +250,14 @@ export default function CaseChronology() {
     setConfirmModal({ isOpen: false, type: null, id: null, title: '', message: '' });
   };
 
+  // Обработчик закрытия предупреждения
+  const closeDataWarning = () => {
+    if (dontShowWarningAgain) {
+        localStorage.setItem('chronos_warning_dismissed', 'true');
+    }
+    setShowDataWarning(false);
+  };
+
   // ---------------------------------------------
 
   const handleEdit = (record: any) => {
@@ -321,7 +336,7 @@ export default function CaseChronology() {
       }
 
       const startIdx = headerRowIndex >= 0 ? headerRowIndex + 1 : 0;
-      const newRecords = [];
+      const newRecords: any[] = [];
       const importedIds = new Set(); 
       
       for (let i = startIdx; i < lines.length; i++) {
@@ -599,6 +614,49 @@ export default function CaseChronology() {
                 </div>
             </Card>
         </div>
+
+        {/* Модальное окно: Предупреждение о сохранении данных */}
+        {showDataWarning && (
+          <div className="fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-[70]">
+            <Card className="w-full max-w-lg p-6 bg-white shadow-2xl relative border-t-4 border-indigo-600">
+                <button 
+                    onClick={closeDataWarning}
+                    className="absolute top-4 right-4 text-slate-400 hover:text-slate-500 transition-colors"
+                >
+                    <X size={20} />
+                </button>
+                <div className="flex items-start space-x-4 mb-4">
+                    <div className="p-3 bg-indigo-100 rounded-full text-indigo-600 flex-shrink-0">
+                        <AlertTriangle size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900">Важно: Ваши данные хранятся локально</h3>
+                        <p className="text-slate-600 mt-2 text-sm leading-relaxed">
+                            Этот сайт работает автономно в вашем браузере и не передает информацию на сервер. 
+                            Если вы очистите кэш или историю браузера, все введенные данные могут быть утеряны.
+                        </p>
+                        <p className="text-slate-600 mt-2 text-sm leading-relaxed font-medium">
+                            Рекомендуем регулярно сохранять резервную копию, нажимая кнопку <span className="text-indigo-600">CSV Export</span>.
+                        </p>
+                    </div>
+                </div>
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 pt-4">
+                    <label className="flex items-center space-x-2 text-sm text-slate-500 cursor-pointer hover:text-slate-700 select-none">
+                        <input
+                            type="checkbox"
+                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                            checked={dontShowWarningAgain}
+                            onChange={(e) => setDontShowWarningAgain(e.target.checked)}
+                        />
+                        <span>Больше не показывать это окно</span>
+                    </label>
+                    <Button onClick={closeDataWarning} className="w-full sm:w-auto">
+                        Всё понятно
+                    </Button>
+                </div>
+            </Card>
+          </div>
+        )}
 
         {/* Модальное окно подтверждения действий */}
         {confirmModal.isOpen && (
