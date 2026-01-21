@@ -1,0 +1,5 @@
+{
+  "name": "Case Chronology",
+  "description": "A comprehensive legal case management tool with chronology tracking, status analytics, and CSV import/export capabilities. (Coefficient: 1.0)",
+  "requestFramePermissions": []
+}
