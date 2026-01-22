@@ -4,7 +4,8 @@
 </div>
 
 # Run and deploy your CaseChronology app
-https://github.com/user-attachments/assets/ab578c75-e347-4fe5-b45c-34705c878ed8
+<img width="1200" height="587" alt="chrome_UxPzCxCbp0" src="https://github.com/user-attachments/assets/4ab14d3b-a840-4b1c-beda-36d62bc40fa0" />
+
 This contains everything you need to run your app locally.
 
 View your app in https://rucase.onlinestrateg.ru/
