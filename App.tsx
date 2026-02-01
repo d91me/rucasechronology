@@ -602,15 +602,7 @@ export default function CaseChronology() {
                     <span className="font-medium text-sm uppercase tracking-wide">Поддержать автора</span>
                 </div>
                 <div className="flex justify-center bg-white">
-                    <iframe 
-                        src="https://yoomoney.ru/quickpay/fundraise/widget?billNumber=1FEB8OPFFPT.260121&" 
-                        width="500" 
-                        height="480" 
-                        frameBorder="0" 
-                        allowTransparency={true}
-                        scrolling="no"
-                        style={{ maxWidth: '100%' }}
-                    ></iframe>
+                    <iframe src="https://yoomoney.ru/quickpay/fundraise/widget?billNumber=1FEB8OPFFPT.260121&" width="500" height="480" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
                 </div>
             </Card>
         </div>
